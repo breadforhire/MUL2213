@@ -1,2 +1,2 @@
 # MUL2213
-MUL2213 algorithm using avx vectors
+MUL2213 algorithm using avx vectors (still in development)
