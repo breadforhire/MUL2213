@@ -11,6 +11,8 @@
 #define c_t  72057594037927936
 
 
+/*ok now we have to change this to 64 bit*/
+
 
 #define PRINT(vector) \
     do { \
@@ -18,6 +20,11 @@
             printf("\n %d --> %d \n", vector[i], i); \
         } \
     } while (0)
+
+
+/*I dont know if this extraction will work*/
+
+
 
 __attribute__((__aligned__(32)))
 static const int32_t x_n[4] = {0, 1, 2, 3};
@@ -60,6 +67,9 @@ void A()
   __m128i z3;
 
 
+
+    /*extraction of low 32 bits*/
+
   /*setting up t registers*/
   __m128i t0;
   __m128i t1;
@@ -70,9 +80,8 @@ void A()
   t0 = _mm_sub_epi32(t0,  _mm_mullo_epi32 (_mm_sub_epi32(_mm_set1_epi32(x_n[1]), _mm_set1_epi32(x_n[2])), _mm_sub_epi32(_mm_set1_epi32(y_n[1]), _mm_set1_epi32(y_n[2]))));
 
 
-  _mm_store_si128((__m128i*)temp, t0);
   /*z3 ← t0 mod t*/
-  z3 = _mm_set1_epi32(temp[0] % c_t);
+  z3 = _mm_set1_epi32(_mm_cvtsi128_si32 (t0) % c_t);
 
   /* a0 + 24(b1 − (x1 − x3)(y1 − y3) + (t0 >> 56)) */
   t1 = _mm_mullo_epi32 (_mm_sub_epi32(_mm_set1_epi32(x_n[1]), _mm_set1_epi32(x_n[3])), _mm_sub_epi32(_mm_set1_epi32(y_n[1]), _mm_set1_epi32(y_n[3])));
@@ -81,7 +90,7 @@ void A()
   t1 =  _mm_add_epi32(_mm_slli_epi64(t0, 56), t1);
 
  _mm_storeu_si128((__m128i*)temp, t1);
- z0 = _mm_set1_epi32 (temp[0] % c_t);
+ z0 = _mm_set1_epi32 (_mm_cvtsi128_si32 (t1) % c_t);
  a0 = _mm_add_epi32(a0, a1);
 
  /* t0 ← a0 − (x0 − x1)(y0 − y1) + 24(b2 − (x2 − x3)(y2 − y3)) + (t1 >> 56) */
@@ -90,18 +99,18 @@ void A()
  t0 = _mm_mullo_epi32(t0, c_24_a);
  t0  = _mm_add_epi32(_mm_sub_epi32(a0, _mm_mullo_epi32 (_mm_sub_epi32(_mm_set1_epi32(x_n[0]), _mm_set1_epi32(x_n[1])), _mm_sub_epi32(_mm_set1_epi32(y_n[0]), _mm_set1_epi32(y_n[1])))), t0);
 
-
- _mm_storeu_si128((__m128i*)temp, t0);
- z1 = _mm_set1_epi32(temp[0] % c_t);
+ t0 = _mm_add_epi32(t0, _mm_set1_epi32(_mm_cvtsi128_si32(t1) >> 58));
+ z1 = _mm_set1_epi32( _mm_cvtsi128_si32 (t0) % c_t);
 
  /* t1 ← a0 + a2 + 24a3 − (x0 − x2)(y0 − y2) + (t0 >> 56) */
  t1 = _mm_add_epi32(a0, a2);
  t1 = _mm_add_epi32(_mm_mullo_epi32(c_24_a, a3), t1);
  t1 = _mm_sub_epi32( t1,  _mm_mullo_epi32 (_mm_sub_epi32(_mm_set1_epi32(x_n[0]), _mm_set1_epi32(x_n[1])), _mm_sub_epi32(_mm_set1_epi32(y_n[0]), _mm_set1_epi32(y_n[1]))));
 
+ t1 = _mm_add_epi32( t1, _mm_set1_epi32(_mm_cvtsi128_si32 (t0) >> 56));
 
  _mm_storeu_si128((__m128i*)temp, t1);
- z2 = _mm_set1_epi32(temp[0] % c_t);
+ z2 = _mm_set1_epi32(_mm_cvtsi128_si32 (t1) % c_t);
 
 
  /* we can store this in a variable, so we do not have to do the operations twice but results are negilibile as of last benchmarking */
