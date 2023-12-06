@@ -108,17 +108,15 @@ void A()
  t1 = _mm_sub_epi32( t1,  _mm_mullo_epi32 (_mm_sub_epi32(_mm_set1_epi32(x_n[0]), _mm_set1_epi32(x_n[1])), _mm_sub_epi32(_mm_set1_epi32(y_n[0]), _mm_set1_epi32(y_n[1]))));
 
  t1 = _mm_add_epi32( t1, _mm_set1_epi32(_mm_cvtsi128_si32 (t0) >> 56));
-
- _mm_storeu_si128((__m128i*)temp, t1);
  z2 = _mm_set1_epi32(_mm_cvtsi128_si32 (t1) % c_t);
 
 
  /* we can store this in a variable, so we do not have to do the operations twice but results are negilibile as of last benchmarking */
  t0 = _mm_add_epi32(z3, _mm_slli_epi64(t1, 58));
- _mm_storeu_si128((__m128i*)temp, t0);
- z3 = _mm_set1_epi32(temp[0] % c_t);
+ z3 = _mm_set1_epi32(_mm_cvtsi128_si32 (t0) % c_t);
  z0 = _mm_add_epi32(z0, _mm_mullo_epi32(c_24_a, _mm_slli_epi64(t1, 58)));
 
+ /*check this last part*/
 
 
 
