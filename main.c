@@ -89,6 +89,7 @@ void A()
   t1 = _mm_add_epi32(a0, _mm_mullo_epi32(t1, c_24_a));
   t1 =  _mm_add_epi32(_mm_slli_epi64(t0, 56), t1);
 
+
  _mm_storeu_si128((__m128i*)temp, t1);
  z0 = _mm_set1_epi32 (_mm_cvtsi128_si32 (t1) % c_t);
  a0 = _mm_add_epi32(a0, a1);
@@ -100,14 +101,19 @@ void A()
  t0  = _mm_add_epi32(_mm_sub_epi32(a0, _mm_mullo_epi32 (_mm_sub_epi32(_mm_set1_epi32(x_n[0]), _mm_set1_epi32(x_n[1])), _mm_sub_epi32(_mm_set1_epi32(y_n[0]), _mm_set1_epi32(y_n[1])))), t0);
 
  t0 = _mm_add_epi32(t0, _mm_set1_epi32(_mm_cvtsi128_si32(t1) >> 58));
+
+
+
  z1 = _mm_set1_epi32( _mm_cvtsi128_si32 (t0) % c_t);
 
  /* t1 ← a0 + a2 + 24a3 − (x0 − x2)(y0 − y2) + (t0 >> 56) */
  t1 = _mm_add_epi32(a0, a2);
  t1 = _mm_add_epi32(_mm_mullo_epi32(c_24_a, a3), t1);
- t1 = _mm_sub_epi32( t1,  _mm_mullo_epi32 (_mm_sub_epi32(_mm_set1_epi32(x_n[0]), _mm_set1_epi32(x_n[1])), _mm_sub_epi32(_mm_set1_epi32(y_n[0]), _mm_set1_epi32(y_n[1]))));
+ t1 = _mm_sub_epi32( t1,  _mm_mullo_epi32 (_mm_sub_epi32(_mm_set1_epi32(x_n[0]), _mm_set1_epi32(x_n[2])), _mm_sub_epi32(_mm_set1_epi32(y_n[0]), _mm_set1_epi32(y_n[2]))));
 
- t1 = _mm_add_epi32( t1, _mm_set1_epi32(_mm_cvtsi128_si32 (t0) >> 56));
+ t1 = _mm_add_epi32( t1, _mm_set1_epi32(_mm_cvtsi128_si32 (_mm_srli_epi32(t0, 56))));
+ t1 = _mm_sub_epi32(t1, _mm_set1_epi32(1));
+
  z2 = _mm_set1_epi32(_mm_cvtsi128_si32 (t1) % c_t);
 
 
@@ -116,7 +122,15 @@ void A()
  z3 = _mm_set1_epi32(_mm_cvtsi128_si32 (t0) % c_t);
  z0 = _mm_add_epi32(z0, _mm_mullo_epi32(c_24_a, _mm_slli_epi64(t1, 58)));
 
- /*check this last part*/
+
+
+ PRINT(z0);
+ printf("%s \n", "___________________");
+ PRINT(z1);
+ printf("%s \n", "___________________");
+ PRINT(z2);
+ printf("%s \n", "___________________");
+ PRINT(z3);
 
 
 
